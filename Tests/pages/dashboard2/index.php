@@ -74,52 +74,53 @@
   
 function change_kiosk_state(side,kioskName) {
 
-  // var leftBtnName = "kiosk_terminal_left";
+  var leftBtnName = "kiosk_terminal_left";
+  var leftBtnName = leftBtnName + kioskName;
 
-  // var class_left = document.getElementById("kiosk_terminal_left").getAttribute("class");
-  // var class_right = document.getElementById("kiosk_terminal_right").getAttribute("class");
+  var class_left = document.getElementById("kiosk_terminal_left").getAttribute("class");
+  var class_right = document.getElementById("kiosk_terminal_right").getAttribute("class");
 
-  // var state_left = 0;
-  // var state_right = 0;
+  var state_left = 0;
+  var state_right = 0;
 
-  // if (side == 0){
-  //   if (class_left == 'btn btn-danger pull-right'){
-  //     state_left = 1;
-  //   }
-  //   if (class_right == 'btn btn-success pull-right'){
-  //     state_right = 1;
-  //   }
-  // }
+  if (side == 0){
+    if (class_left == 'btn btn-danger pull-right'){
+      state_left = 1;
+    }
+    if (class_right == 'btn btn-success pull-right'){
+      state_right = 1;
+    }
+  }
 
-  // if (side == 1){
-  //   if (class_right == 'btn btn-danger pull-right'){
-  //     state_right = 1;
-  //   }
-  //   if (class_left == 'btn btn-success pull-right'){
-  //     state_left = 1;
-  //   }
-  // }
+  if (side == 1){
+    if (class_right == 'btn btn-danger pull-right'){
+      state_right = 1;
+    }
+    if (class_left == 'btn btn-success pull-right'){
+      state_left = 1;
+    }
+  }
 
-  //   var kiosk_id = "<?php echo $kiosk_id ?>";
-  //   var send_data = {'kiosk_id': kiosk_id, 'state_left': state_left, 'state_right': state_right}
-  //   $.ajax({
-  //       type: 'POST',
-  //       data: send_data,
-  //       // contentType: 'application/jsonp',
-  //       url: 'followersdata_state.php',
-  //       success: function(response) {
-  //           console.log(response);
-  //           //var data = JSON.parse(response);
-  //           alert("Operation is done!!!");
-  //     kiosk_info ();
+    var kiosk_id = "<?php echo $kiosk_id ?>";
+    var send_data = {'kiosk_id': kiosk_id, 'state_left': state_left, 'state_right': state_right}
+    $.ajax({
+        type: 'POST',
+        data: send_data,
+        // contentType: 'application/jsonp',
+        url: 'followersdata_state.php',
+        success: function(response) {
+            console.log(response);
+            //var data = JSON.parse(response);
+            alert("Operation is done!!!");
+      kiosk_info ();
 
-  //     },
-  //       error: function( jqXhr, textStatus, errorThrown ){
-  //           console.log( errorThrown );
-  //           // document.location.reload(true);
-  //     alert("Something wrong!!! Try again.");
-  //       }
-  //   });
+      },
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            // document.location.reload(true);
+      alert("Something wrong!!! Try again.");
+        }
+    });
 
   alert("Kiosk "+ kioskName + "Value:" + side );
 
@@ -142,20 +143,23 @@ $dateEnd = "2019-10-02 23:59:59";
 
 function GetTableData($kioskName){
   //require("dbconn.php");
+  include('../connect.php');
 
   $dateEnd = "2019-10-02 23:59:59";
   $dateStart = "2019-10-02 00:00:00";
 
-  $sqlCount = "SELECT Count(product_id)AS Count from orders WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd';";
+  $sqlCount = "SELECT Count(product_id)AS Count, Sum(price)as Sum from orders WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd';";
  // $result = mysql_query("SELECT Count(product_id)AS Count from orders WHERE kiosk_id = '$kiosk_id' and date >= '$dateStart' and date <= 'dateEnd") or trigger_error(mysql_error()); 
-
   //echo $dateStart;
   //echo $dateEnd;
-  echo $sqlCount;
+  //echo $sqlCount;
 
-  $sqlresult = mysqli_query($connection, $sqlCount);
-
-  return $sqlresult;
+  if($sqlresult = mysqli_query($connection, $sqlCount)){
+      $data = $row = mysqli_fetch_array($sqlresult);
+      return $data;
+    }else{
+    return "0";
+   }
  }
 
 
@@ -166,7 +170,7 @@ function GetTableData($kioskName){
   $white = "#ffffff";
   $red = "#f56c5f";
 
-  $diffDate = 0;
+  $diffDate = 3;
 
   if($diffDate > 1){
     $resultColor = $red;
@@ -188,10 +192,9 @@ $sqlactive = " SELECT kiosk_id FROM kiosk";
 
                           
                           echo "<div class='box box-info'><div class='box-body'>";
-
-                          echo "<h3>Kiosk #".$row['kiosk_id']."</h3>";
                           echo "<div style = '' >";
-
+                          echo "<h3>Kiosk #".$row['kiosk_id'];
+                          
                           $kioskName = $row['kiosk_id'];
 
                           // Button ID name generate for each kiosk:
@@ -208,14 +211,17 @@ $sqlactive = " SELECT kiosk_id FROM kiosk";
 
                           //echo "<div class='box box-info'> <div class='box-header with-border'><h3 class='box-title'>Buttons</h3>";
                           echo "<button type='button' class='btn btn-success pull-right' style='width:200px;' id='$buttonIDRight' onclick='change_kiosk_state(1,\"$kioskName\")'>Terminal Right</button><button type='button' class='btn btn-danger pull-right'  style='width: 200px;'id='$buttonIDLeft' onclick='change_kiosk_state(0,\"$kioskName\")'>Terminal Left</button>";
-                          echo "</div><br><br>";
+                          echo "</div><br><br></h3>";
 
                           // Generate table:
                           echo "<table class='table table-bordered table-hover'>";
-                          echo "<tr> <th> Name</th> <th>Sales today</th> <th>Last time</th>  </tr>";
+                          echo "<tr style = 'background-color:#d6d2d2;'>  <th>Sales today</th> <th>Summa</th> <th>Last order time</th>  </tr>";
 
                           $sqlData = GetTableData($row['kiosk_id']);
-                          echo "<tr style = 'background-color: #f56c5f; '> <th> TEST </th> <th> '$sqlData' </th> <th> 00:00:00</th> </tr>";
+                          $sales = $sqlData['Count'];
+                          $summa = $sqlData['Sum'];
+
+                          echo "<tr > <th> $sales </th> <th> $summa</th> <th style = 'background-color: $tableColor; '> 00:00:00</th> </tr>";
 
                           echo "</table>";
 

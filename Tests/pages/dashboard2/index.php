@@ -42,6 +42,9 @@
   <script src="../../plugins/datatables/dataTables.bootstrap.min.js"></script>
 
 
+<!-- <script src="buttonActions.js">
+</script> -->
+
 
   <div class="wrapper">
 <!--     <?php include_once "../layout/topmenu.php"; ?>
@@ -51,36 +54,186 @@
     <!-- Content Wrapper. Contains page content
     <div class="content-wrapper">
        <!-- Content Header (Page header)  -->
+
+
+
       <section class="content-header">
         <h1>
           Admin page
         </h1>
       </section>
 
+<!-- <style type="text/css">
+  .button{
+    width:100px;
+  }
+
+</style> -->
+
+<script type="text/javascript">
+  
+function change_kiosk_state(side,kioskName) {
+
+  // var leftBtnName = "kiosk_terminal_left";
+
+  // var class_left = document.getElementById("kiosk_terminal_left").getAttribute("class");
+  // var class_right = document.getElementById("kiosk_terminal_right").getAttribute("class");
+
+  // var state_left = 0;
+  // var state_right = 0;
+
+  // if (side == 0){
+  //   if (class_left == 'btn btn-danger pull-right'){
+  //     state_left = 1;
+  //   }
+  //   if (class_right == 'btn btn-success pull-right'){
+  //     state_right = 1;
+  //   }
+  // }
+
+  // if (side == 1){
+  //   if (class_right == 'btn btn-danger pull-right'){
+  //     state_right = 1;
+  //   }
+  //   if (class_left == 'btn btn-success pull-right'){
+  //     state_left = 1;
+  //   }
+  // }
+
+  //   var kiosk_id = "<?php echo $kiosk_id ?>";
+  //   var send_data = {'kiosk_id': kiosk_id, 'state_left': state_left, 'state_right': state_right}
+  //   $.ajax({
+  //       type: 'POST',
+  //       data: send_data,
+  //       // contentType: 'application/jsonp',
+  //       url: 'followersdata_state.php',
+  //       success: function(response) {
+  //           console.log(response);
+  //           //var data = JSON.parse(response);
+  //           alert("Operation is done!!!");
+  //     kiosk_info ();
+
+  //     },
+  //       error: function( jqXhr, textStatus, errorThrown ){
+  //           console.log( errorThrown );
+  //           // document.location.reload(true);
+  //     alert("Something wrong!!! Try again.");
+  //       }
+  //   });
+
+  alert("Kiosk "+ kioskName + "Value:" + side );
+
+  }
+
+</script>
+
+<?php 
+
+include('../connect.php');
+
+// $dateStart = date("Y-m-d");
+// $dateEnd = date("Y-m-d");
+
+//$dateStart = "2019-10-02";
+$dateStart = "2019-10-02 00:00:00";
+
+//$dateEnd = "2019-10-02";
+$dateEnd = "2019-10-02 23:59:59";
+
+function GetTableData($kioskName){
+  //require("dbconn.php");
+
+  $dateEnd = "2019-10-02 23:59:59";
+  $dateStart = "2019-10-02 00:00:00";
+
+  $sqlCount = "SELECT Count(product_id)AS Count from orders WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd';";
+ // $result = mysql_query("SELECT Count(product_id)AS Count from orders WHERE kiosk_id = '$kiosk_id' and date >= '$dateStart' and date <= 'dateEnd") or trigger_error(mysql_error()); 
+
+  //echo $dateStart;
+  //echo $dateEnd;
+  echo $sqlCount;
+
+  $sqlresult = mysqli_query($connection, $sqlCount);
+
+  return $sqlresult;
+ }
 
 
-      <div class="box box-info">
-       <div class="box-body">
-        Kiosk #1
+ function getColor($orderDate) {
+  //$diffDate = $hourDiff=round(abs($date2 - $date1) / (60*60*24),0);
 
+  $resultColor = "#fffff";
+  $white = "#ffffff";
+  $red = "#f56c5f";
 
-        </div>
-          </div>
+  $diffDate = 0;
 
-     <div class="box box-info">
-       <div class="box-body">
-        Kiosk #2
+  if($diffDate > 1){
+    $resultColor = $red;
+  }else{
+    $resultColor = $white;
+  }
 
+  return $resultColor;
+ }
 
-        </div>
-          </div>
+//  ==== Automatically generate <div> for each Kiosk from table "kiosk": ====
 
-      <div class="box box-info">
-       <div class="box-body">
-        Kiosk #3
+$sqlactive = " SELECT kiosk_id FROM kiosk";
+              if($result = mysqli_query($connection, $sqlactive)){
+                  if(mysqli_num_rows($result) > 0){
+  
+                      while($row = mysqli_fetch_array($result)){
+                        // Generate data for each kiosk here:
 
+                          
+                          echo "<div class='box box-info'><div class='box-body'>";
 
-        </div>
-          </div>
+                          echo "<h3>Kiosk #".$row['kiosk_id']."</h3>";
+                          echo "<div style = '' >";
+
+                          $kioskName = $row['kiosk_id'];
+
+                          // Button ID name generate for each kiosk:
+                          $buttonIDRight = "kiosk_terminal_right";
+                          $buttonIDRight .= $kioskName;
+
+                          $buttonIDLeft = "kiosk_terminal_left";
+                          $buttonIDLeft .= $kioskName;
+
+                          $lastOrderDate = " ";
+
+                          $tableColor = getColor($lastOrderDate);
+                          //$tableColor = "#FF0000";
+
+                          //echo "<div class='box box-info'> <div class='box-header with-border'><h3 class='box-title'>Buttons</h3>";
+                          echo "<button type='button' class='btn btn-success pull-right' style='width:200px;' id='$buttonIDRight' onclick='change_kiosk_state(1,\"$kioskName\")'>Terminal Right</button><button type='button' class='btn btn-danger pull-right'  style='width: 200px;'id='$buttonIDLeft' onclick='change_kiosk_state(0,\"$kioskName\")'>Terminal Left</button>";
+                          echo "</div><br><br>";
+
+                          // Generate table:
+                          echo "<table class='table table-bordered table-hover'>";
+                          echo "<tr> <th> Name</th> <th>Sales today</th> <th>Last time</th>  </tr>";
+
+                          $sqlData = GetTableData($row['kiosk_id']);
+                          echo "<tr style = 'background-color: #f56c5f; '> <th> TEST </th> <th> '$sqlData' </th> <th> 00:00:00</th> </tr>";
+
+                          echo "</table>";
+
+                          echo "</div></div>";
+                      }
+                      //echo "</table>";
+                      //echo "</table>";
+                      // Free result set
+                      mysqli_free_result($result);
+                  } else{
+                      echo "No records matching your query were found.";
+                  }
+              } else{
+                  echo "ERROR: Could not able to execute $sql. " . mysqli_error($connection);
+              }
+              // Close connection
+              mysqli_close($connection);
+
+?>
 
 

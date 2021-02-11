@@ -41,10 +41,8 @@
   <script src="../../plugins/datatables/jquery.dataTables.min.js"></script>
   <script src="../../plugins/datatables/dataTables.bootstrap.min.js"></script>
 
-
 <!-- <script src="buttonActions.js">
 </script> -->
-
 
   <div class="wrapper">
 <!--     <?php include_once "../layout/topmenu.php"; ?>
@@ -55,30 +53,27 @@
     <div class="content-wrapper">
        <!-- Content Header (Page header)  -->
 
-
-
       <section class="content-header">
         <h1>
           Admin page
         </h1>
       </section>
 
-<!-- <style type="text/css">
-  .button{
-    width:100px;
-  }
-
-</style> -->
 
 <script type="text/javascript">
   
 function change_kiosk_state(side,kioskName) {
 
-  var leftBtnName = "kiosk_terminal_left";
-  var leftBtnName = leftBtnName + kioskName;
+  //var leftBtnName = "kiosk_terminal_left";
+  //var leftBtnName = leftBtnName + kioskName;
 
-  var class_left = document.getElementById("kiosk_terminal_left").getAttribute("class");
-  var class_right = document.getElementById("kiosk_terminal_right").getAttribute("class");
+  var rBtnID = "kiosk_terminal_right" + kioskName;
+  var lBtnID = "kiosk_terminal_left" + kioskName;
+
+  alert(lBtnID);
+
+  var class_left = document.getElementById(lBtnID).getAttribute("class");
+  var class_right = document.getElementById(rBtnID).getAttribute("class");
 
   var state_left = 0;
   var state_right = 0;
@@ -99,9 +94,10 @@ function change_kiosk_state(side,kioskName) {
     if (class_left == 'btn btn-success pull-right'){
       state_left = 1;
     }
+
   }
 
-    var kiosk_id = "<?php echo $kiosk_id ?>";
+    var kiosk_id = kioskName;
     var send_data = {'kiosk_id': kiosk_id, 'state_left': state_left, 'state_right': state_right}
     $.ajax({
         type: 'POST',
@@ -112,8 +108,7 @@ function change_kiosk_state(side,kioskName) {
             console.log(response);
             //var data = JSON.parse(response);
             alert("Operation is done!!!");
-      kiosk_info ();
-
+      kiosk_info (kioskName);
       },
         error: function( jqXhr, textStatus, errorThrown ){
             console.log( errorThrown );
@@ -121,9 +116,49 @@ function change_kiosk_state(side,kioskName) {
       alert("Something wrong!!! Try again.");
         }
     });
+  alert("Kiosk:"+ kioskName + " Value:" + side );
+  }
 
-  alert("Kiosk "+ kioskName + "Value:" + side );
+  function kiosk_info (kName) {
+    var kiosk_id = kName;
+    var send_data = {'kiosk_id': kiosk_id}
+    $.ajax({
+        type: 'POST',
+        data: send_data,
+        // contentType: 'application/jsonp',
+        url: 'followersdata_kiosk.php',
+        success: function(response) {
+            console.log(response);
+      //alert("Operation is done!!!");
 
+            var data = JSON.parse(response);
+            var t_l = data['terminal_left'];
+            var t_r = data['terminal_right'];
+
+      //console.log(document.getElementById("kiosk_terminal_left").getAttribute("class"));
+
+        var rBtnID = "kiosk_terminal_right" + kioskName;
+        var lBtnID = "kiosk_terminal_left" + kioskName;
+
+            if (t_l == 1){
+        (document.getElementById(lBtnID)).setAttribute("class", "btn btn-success pull-right");
+      } else {
+        (document.getElementById(lBtnID)).setAttribute("class", "btn btn-danger pull-right");
+      }
+
+      if (t_r == 1){
+        (document.getElementById(rBtnID)).setAttribute("class", "btn btn-success pull-right");
+      } else {
+        (document.getElementById(rBtnID)).setAttribute("class", "btn btn-danger pull-right");
+      }
+
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+            console.log( errorThrown );
+            // document.location.reload(true);
+      alert("Something wrong!!! Try again.");
+        }
+    });
   }
 
 </script>
@@ -132,30 +167,36 @@ function change_kiosk_state(side,kioskName) {
 
 include('../connect.php');
 
-// $dateStart = date("Y-m-d");
-// $dateEnd = date("Y-m-d");
-
-//$dateStart = "2019-10-02";
-$dateStart = "2019-10-02 00:00:00";
-
-//$dateEnd = "2019-10-02";
-$dateEnd = "2019-10-02 23:59:59";
-
 function GetTableData($kioskName){
   //require("dbconn.php");
   include('../connect.php');
 
-  $dateEnd = "2019-10-02 23:59:59";
-  $dateStart = "2019-10-02 00:00:00";
+   $dateEnd = "2021-02-11 23:59:59";
+   $dateStart = "2021-02-11 00:00:00";
 
-  $sqlCount = "SELECT Count(product_id)AS Count, Sum(price)as Sum from orders WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd';";
- // $result = mysql_query("SELECT Count(product_id)AS Count from orders WHERE kiosk_id = '$kiosk_id' and date >= '$dateStart' and date <= 'dateEnd") or trigger_error(mysql_error()); 
-  //echo $dateStart;
-  //echo $dateEnd;
-  //echo $sqlCount;
+    //$dateStart = date("Y-m-d 00:00:00");
+    //$dateStart .= " 00:00:00";
+
+    //$dateEnd = date("Y-m-d 23:59:59");
+    //$dateEnd .= " 23:59:59";
+
+    // echo "<br> Date start:".$dateStart;
+    // echo "<br> Date end:".$dateEnd;
+
+    // $dateStart = strval($dateStart);
+    // $dateEnd = strval($dateEnd);
+
+    // $dStrt = (string)$dateStart;
+    // $dEnd = (string)$dateEnd;
+
+    $sqlCount = "SELECT Count(product_id) AS Count, Sum(price) AS Sum from orders WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd';";
+
+    //echo $sqlCount;
 
   if($sqlresult = mysqli_query($connection, $sqlCount)){
       $data = $row = mysqli_fetch_array($sqlresult);
+      // echo $data['Count'];
+      // echo $data['Sum'];
       return $data;
     }else{
     return "0";
@@ -166,16 +207,32 @@ function GetTableData($kioskName){
 
   include('../connect.php');
 
-  $dateEnd = "2019-10-02 23:59:59";
-  $dateStart = "2019-10-02 00:00:00";
+    // $dateStart = date("Y-m-d 00:00:00");
+    //$dateStart .= " 00:00:00";
+
+    // $dateEnd = date("Y-m-d 23:59:59");
+    //$dateEnd .= " 23:59:59";
+
+     $dateEnd = "2021-02-11 23:59:59";
+     $dateStart = "2021-02-11 00:00:00";
+
+    echo "<br>DATE START:".$dateStart;
+    echo "<br>DATE END:".$dateEnd;
+    
+  // $dateEnd = "2019-10-02 23:59:59";
+  // $dateStart = "2019-10-02 00:00:00";
 
   $sqlDate = "SELECT date from orders  WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd' ORDER BY date DESC LIMIT 1";
 
-   if($sqlresult = mysqli_query($connection, $sqlDate)){
-      $data = $row = mysqli_fetch_array($sqlresult);
+  //echo $sqlDate;
+
+   if($sqlresult = mysqli_query($connection, $sqlDate) ){
+      $data = mysqli_fetch_array($sqlresult);
+      //echo "OK";
+      //echo $data;
       return $data;
     }else{
-    return "0";
+    return "No orders";
    }
  }
 
@@ -184,11 +241,14 @@ function GetTableData($kioskName){
     if (function_exists('date_default_timezone_set'))
           date_default_timezone_set('Europe/Moscow');
 
-   $timeNow = date("G:i:s ");
+  $timeNow = date("Y-m-d G:i:s ");
 
-  echo "<br>".$timeNow;
+  $timeNow = strtotime($timeNow);
+  $tDateNow = strtotime($orderDate);
 
-  $diffDate = $hourDiff=round(abs($date2 - $date1) / (60*60*24),0);
+  $diffDate = floor(abs($timeNow - $tDateNow)/3600);
+
+  //echo "<br> TIME DIFFERENCE (HOURS):".$diffDate;
 
   $resultColor = "#fffff";
   $white = "#ffffff";
@@ -231,12 +291,12 @@ $sqlactive = " SELECT kiosk_id FROM kiosk";
                           $lastOrderDate = GetLastData($kioskName);
                           $lastDate = $lastOrderDate['date'];
 
-                          $tableColor = getColor($lastOrderDate);
+                          $tableColor = getColor($lastDate);
                           //$tableColor = "#FF0000";
 
                           //echo "<div class='box box-info'> <div class='box-header with-border'><h3 class='box-title'>Buttons</h3>";
                           echo "<button type='button' class='btn btn-success pull-right' style='width:200px;' id='$buttonIDRight' onclick='change_kiosk_state(1,\"$kioskName\")'>Terminal Right</button><button type='button' class='btn btn-danger pull-right'  style='width: 200px;'id='$buttonIDLeft' onclick='change_kiosk_state(0,\"$kioskName\")'>Terminal Left</button>";
-                          echo "</div><br><br></h3>";
+                          echo "</div><BR></h3>";
 
                           // Generate table:
                           echo "<table class='table table-bordered table-hover'>";

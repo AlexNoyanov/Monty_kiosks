@@ -137,8 +137,8 @@ function change_kiosk_state(side,kioskName) {
 
       //console.log(document.getElementById("kiosk_terminal_left").getAttribute("class"));
 
-        var rBtnID = "kiosk_terminal_right" + kioskName;
-        var lBtnID = "kiosk_terminal_left" + kioskName;
+        var rBtnID = "kiosk_terminal_right" + kiosk_id;
+        var lBtnID = "kiosk_terminal_left" + kiosk_id;
 
             if (t_l == 1){
         (document.getElementById(lBtnID)).setAttribute("class", "btn btn-success pull-right");
@@ -177,23 +177,12 @@ function GetTableData($kioskName){
   //require("dbconn.php");
   include('../connect.php');
 
-   $dateEnd = "2021-02-11 23:59:59";
-   $dateStart = "2021-02-11 00:00:00";
+    // $dateEnd = "2021-02-11 23:59:59";
+    // $dateStart = "2021-02-11 00:00:00";
 
     $dateStart = date("Y-m-d 00:00:00");
-    //$dateStart .= " 00:00:00";
 
     $dateEnd = date("Y-m-d 23:59:59");
-    //$dateEnd .= " 23:59:59";
-
-    // echo "<br> Date start:".$dateStart;
-    // echo "<br> Date end:".$dateEnd;
-
-    // $dateStart = strval($dateStart);
-    // $dateEnd = strval($dateEnd);
-
-    // $dStrt = (string)$dateStart;
-    // $dEnd = (string)$dateEnd;
 
     $sqlCount = "SELECT Count(product_id) AS Count, Sum(price) AS Sum from orders WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd';";
 

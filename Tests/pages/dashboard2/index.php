@@ -162,9 +162,33 @@ function GetTableData($kioskName){
    }
  }
 
+ function GetLastData($kioskName){
+
+  include('../connect.php');
+
+  $dateEnd = "2019-10-02 23:59:59";
+  $dateStart = "2019-10-02 00:00:00";
+
+  $sqlDate = "SELECT date from orders  WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd' ORDER BY date DESC LIMIT 1";
+
+   if($sqlresult = mysqli_query($connection, $sqlDate)){
+      $data = $row = mysqli_fetch_array($sqlresult);
+      return $data;
+    }else{
+    return "0";
+   }
+ }
 
  function getColor($orderDate) {
-  //$diffDate = $hourDiff=round(abs($date2 - $date1) / (60*60*24),0);
+  //Setting Moscow timezone
+    if (function_exists('date_default_timezone_set'))
+          date_default_timezone_set('Europe/Moscow');
+
+   $timeNow = date("G:i:s ");
+
+  echo "<br>".$timeNow;
+
+  $diffDate = $hourDiff=round(abs($date2 - $date1) / (60*60*24),0);
 
   $resultColor = "#fffff";
   $white = "#ffffff";
@@ -204,7 +228,8 @@ $sqlactive = " SELECT kiosk_id FROM kiosk";
                           $buttonIDLeft = "kiosk_terminal_left";
                           $buttonIDLeft .= $kioskName;
 
-                          $lastOrderDate = " ";
+                          $lastOrderDate = GetLastData($kioskName);
+                          $lastDate = $lastOrderDate['date'];
 
                           $tableColor = getColor($lastOrderDate);
                           //$tableColor = "#FF0000";
@@ -215,13 +240,13 @@ $sqlactive = " SELECT kiosk_id FROM kiosk";
 
                           // Generate table:
                           echo "<table class='table table-bordered table-hover'>";
-                          echo "<tr style = 'background-color:#d6d2d2;'>  <th>Sales today</th> <th>Summa</th> <th>Last order time</th>  </tr>";
+                          echo "<tr style = 'background-color:#d6d2d2;'>  <th>Sales today</th> <th>Sales Sum</th> <th>Last order time</th>  </tr>";
 
                           $sqlData = GetTableData($row['kiosk_id']);
                           $sales = $sqlData['Count'];
                           $summa = $sqlData['Sum'];
 
-                          echo "<tr > <th> $sales </th> <th> $summa</th> <th style = 'background-color: $tableColor; '> 00:00:00</th> </tr>";
+                          echo "<tr > <th style = 'width:250px;'> $sales </th> <th style = 'width:250px;'> $summa</th> <th style = ' width:250px; background-color: $tableColor; '> $lastDate </th></tr>";
 
                           echo "</table>";
 

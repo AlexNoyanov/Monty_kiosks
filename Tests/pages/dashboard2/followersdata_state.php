@@ -19,9 +19,9 @@ if (isset($_POST['kiosk_id'])){
 
     print json_encode($kiosk_id);
 
-    echo "KioskID == ".$kiosk_id;
-    echo $state_left;
-    echo $state_right;
+    // echo "KioskID == ".$kiosk_id;
+    // echo $state_left;
+    // echo $state_right;
 
     $query = "UPDATE kiosk SET terminal_left='$state_left', terminal_right='$state_right'  WHERE kiosk_id='$kiosk_id'";
 

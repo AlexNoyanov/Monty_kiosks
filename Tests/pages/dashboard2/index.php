@@ -70,7 +70,7 @@ function change_kiosk_state(side,kioskName) {
   var rBtnID = "kiosk_terminal_right" + kioskName;
   var lBtnID = "kiosk_terminal_left" + kioskName;
 
-  alert(lBtnID);
+  //alert(lBtnID);
 
   var class_left = document.getElementById(lBtnID).getAttribute("class");
   var class_right = document.getElementById(rBtnID).getAttribute("class");
@@ -108,7 +108,7 @@ function change_kiosk_state(side,kioskName) {
             console.log(response);
             //var data = JSON.parse(response);
             alert("Operation is done!!!");
-      kiosk_info (kioskName);
+            kiosk_info(kiosk_id);
       },
         error: function( jqXhr, textStatus, errorThrown ){
             console.log( errorThrown );
@@ -116,7 +116,7 @@ function change_kiosk_state(side,kioskName) {
       alert("Something wrong!!! Try again.");
         }
     });
-  alert("Kiosk:"+ kioskName + " Value:" + side );
+  //alert("Kiosk:"+ kioskName + " Value:" + side );
   }
 
   function kiosk_info (kName) {
@@ -129,11 +129,11 @@ function change_kiosk_state(side,kioskName) {
         url: 'followersdata_kiosk.php',
         success: function(response) {
             console.log(response);
-      //alert("Operation is done!!!");
-
+      //alert("INFO: Operation is done!!!");
             var data = JSON.parse(response);
             var t_l = data['terminal_left'];
             var t_r = data['terminal_right'];
+            //alert(data);
 
       //console.log(document.getElementById("kiosk_terminal_left").getAttribute("class"));
 
@@ -161,6 +161,12 @@ function change_kiosk_state(side,kioskName) {
     });
   }
 
+    $(document).ready(function() {
+      for (var i = 1; i <= 50; i++) {
+            kiosk_info(i);
+      }
+  });
+
 </script>
 
 <?php 
@@ -174,10 +180,10 @@ function GetTableData($kioskName){
    $dateEnd = "2021-02-11 23:59:59";
    $dateStart = "2021-02-11 00:00:00";
 
-    //$dateStart = date("Y-m-d 00:00:00");
+    $dateStart = date("Y-m-d 00:00:00");
     //$dateStart .= " 00:00:00";
 
-    //$dateEnd = date("Y-m-d 23:59:59");
+    $dateEnd = date("Y-m-d 23:59:59");
     //$dateEnd .= " 23:59:59";
 
     // echo "<br> Date start:".$dateStart;
@@ -207,20 +213,9 @@ function GetTableData($kioskName){
 
   include('../connect.php');
 
-    // $dateStart = date("Y-m-d 00:00:00");
-    //$dateStart .= " 00:00:00";
+    $dateStart = date("Y-m-d 00:00:00");
 
-    // $dateEnd = date("Y-m-d 23:59:59");
-    //$dateEnd .= " 23:59:59";
-
-     $dateEnd = "2021-02-11 23:59:59";
-     $dateStart = "2021-02-11 00:00:00";
-
-    echo "<br>DATE START:".$dateStart;
-    echo "<br>DATE END:".$dateEnd;
-    
-  // $dateEnd = "2019-10-02 23:59:59";
-  // $dateStart = "2019-10-02 00:00:00";
+    $dateEnd = date("Y-m-d 23:59:59");
 
   $sqlDate = "SELECT date from orders  WHERE kiosk_id = '$kioskName' and date >= '$dateStart' and date <= '$dateEnd' ORDER BY date DESC LIMIT 1";
 
@@ -228,7 +223,6 @@ function GetTableData($kioskName){
 
    if($sqlresult = mysqli_query($connection, $sqlDate) ){
       $data = mysqli_fetch_array($sqlresult);
-      //echo "OK";
       //echo $data;
       return $data;
     }else{
@@ -242,10 +236,8 @@ function GetTableData($kioskName){
           date_default_timezone_set('Europe/Moscow');
 
   $timeNow = date("Y-m-d G:i:s ");
-
   $timeNow = strtotime($timeNow);
   $tDateNow = strtotime($orderDate);
-
   $diffDate = floor(abs($timeNow - $tDateNow)/3600);
 
   //echo "<br> TIME DIFFERENCE (HOURS):".$diffDate;
@@ -254,7 +246,7 @@ function GetTableData($kioskName){
   $white = "#ffffff";
   $red = "#f56c5f";
 
-  $diffDate = 3;
+  //$diffDate = 3;
 
   if($diffDate > 1){
     $resultColor = $red;
@@ -267,14 +259,12 @@ function GetTableData($kioskName){
 
 //  ==== Automatically generate <div> for each Kiosk from table "kiosk": ====
 
-$sqlactive = " SELECT kiosk_id FROM kiosk";
+$sqlactive = "SELECT kiosk_id FROM kiosk";
               if($result = mysqli_query($connection, $sqlactive)){
                   if(mysqli_num_rows($result) > 0){
   
-                      while($row = mysqli_fetch_array($result)){
+                      while($row = mysqli_fetch_array($result) ){
                         // Generate data for each kiosk here:
-
-                          
                           echo "<div class='box box-info'><div class='box-body'>";
                           echo "<div style = '' >";
                           echo "<h3>Kiosk #".$row['kiosk_id'];

@@ -1,6 +1,6 @@
 <div class="login-box">
   <div class="login-logo">
-    <a href="../../pages/dashboard2/"><b>Monty</b>Cafe</a>
+    <a href="../../pages/dashboard2/"><b>Monty</b>Admin</a>
   </div>
   <!-- /.login-logo -->
   <div class="login-box-body">
@@ -41,7 +41,7 @@
             background-color:#e0e0eb;
     }
     </style>
-
+<!-- 
     <div  id="cookieDiv" class="mystyle">
 <p>This site uses cookie. Please accept <button onclick="myFunction()">Accept</button>
     </p></div>
@@ -56,7 +56,7 @@
     }
 
     
-    </script>
+    </script> -->
 
   <!-- /.login-box-body -->
 </div>
